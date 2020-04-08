@@ -23,14 +23,14 @@ Hermes searches for its configuration in multiple places and if it finds one it 
 `./hermes.conf`, `/etc/hermes.conf`, custom location given by `--config` parameter.
 
 Every backend will try to activate and configure itself from keys in the configuration. For example the
-most simple backend is emailing backend. It will look for configuration keys prefixed with `email`. 
+most simple backend is emailing backend. It will look for configuration keys prefixed with `email`.
 
 ## Usage
 
 Once hermes server is running, you can send messages that are supposed to be passed further.
 
 ```bash
-curl -XPOST -d '{recipient:"user@example.com", subject:"Confirm your account", message:"<a href="click.me/1234">Click me</a>"}' localhost:5587
+curl -XPOST -d '{recipient:"Name <user@example.com>", subject:"Confirm your account", message:"<a href="click.me/1234">Click me</a>"}' localhost:5587
 {"uuid": acb123}  # email is the default backend
 curl -XPOST -d '{recipient:"whatsapp:+41123456789", subject:"Your order has arrived", message:"Pick it up in our shop any time"}' localhost:5587
 {"uuid": acb124}  # uuid is returned in HTTP 201 response
