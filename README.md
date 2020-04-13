@@ -10,14 +10,14 @@ The application is a proxy to such services and therefore it is intended for sma
 
 ## Setup
 
+Create PostgreSQL database and run `CREATE EXTENSION pgcrypto;`.
+
 ```bash
 go get github.com/katomaso/hermes
-./hermes
 ```
 
 Hermes runs on localhost and port 5587 by default. It accepts JSON messages over HTTP(S) protocol. It is highly
-recommended to use HTTPS that can be turned on by `--https /path/to/certificate --key /path/to/key` where
-the key's password (if there is any) will be taken from `$HERMES_KEY_PASS`.
+recommended to use HTTPS that can be turned on by `--https /path/to/certificate --key /path/to/key --keypass $HERMES_KEY_PASS`.
 
 Hermes searches for its configuration in multiple places and if it finds one it stops looking further:
 `./hermes.conf`, `/etc/hermes.conf`, custom location given by `--config` parameter.

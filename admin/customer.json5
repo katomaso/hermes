@@ -1,0 +1,13 @@
+{
+    "name": "customer_add",
+    "title": "Add an Customer",
+    "description": "Add an customer",
+    "parameters": [
+        { "name": "name", "type": "string" },
+        { "name": "contact", "type": "string" }
+    ],
+    "statement": "\
+        INSERT INTO employees (name, contact)\n\
+        VALUES ($name, $contact)",
+    "statement_type": "INSERT"
+}

@@ -1,0 +1,10 @@
+{
+    "name": "customers",
+    "title": "Customers",
+    "description": "List all customers",
+    "statement": "\
+        SELECT\n\
+            id, name, contact, token
+        FROM customers",
+    "statement_type": "SELECT"
+}

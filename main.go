@@ -4,7 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"hermes"
+	"hermes/core"
+	"hermes/queue"
+	"hermes/relay"
+	"hermes/storage"
+	"log"
 	"net/http"
 )
 
@@ -26,12 +30,14 @@ func main() {
 	flag.StringVar(&listen, "listen", "localhost:5587", "Address to listen to for Hermes server")
 	flag.StringVar(&dbname, "dbname", "hermes", "Database name where to store user information")
 	flag.StringVar(&dbuser, "dbuser", "hermes", "Database user for database")
-	flag.StringVar(&dbpass, "dbpass", "hermes", "Database password for database (pass it via env var)")
+	flag.StringVar(&dbpass, "dbpass", "hermes", "Database password for database (pass it via env var e.g. $DBPASS)")
 	flag.StringVar(&dbhost, "dbhost", "localhost:5432", "Database host and port")
 	flag.Parse()
 
-	hermes.InitStorage(dbname, dbhost, dbuser, dbpass)
-	hermes.InitQueue()
+	storage.InitStorage(dbname, dbhost, dbuser, dbpass)
+	queue.InitQueue()
+	relay.InitRelay(queue.Queue())
+
 	router = mux.NewRouter()
 	router.HandleFunc("/send", send).Name("send")
 	router.HandleFunc("/status/{uuid}", status).Name("status")
@@ -39,23 +45,24 @@ func main() {
 		Addr:    listen,
 		Handler: router,
 	}
+	log.Println("Listening on " + listen)
 	server.ListenAndServe()
-	hermes.CloseQueue()
-	hermes.CloseStorage()
+	queue.CloseQueue()
+	storage.CloseStorage()
 }
 
 func send(w http.ResponseWriter, r *http.Request) {
-	customer, err := hermes.GetCustomer(r.Header.Get("Hermes-Token"))
+	customer, err := core.GetCustomer(r.Header.Get("Hermes-Token"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	message, err := hermes.ParseMessage(r.Body)
+	message, err := queue.ParseMessage(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	handle, err := hermes.Send(customer, message)
+	handle, err := queue.Send(customer, message)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
